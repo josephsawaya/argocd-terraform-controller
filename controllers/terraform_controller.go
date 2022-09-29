@@ -81,7 +81,8 @@ func (r *TerraformReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
-	image := "quay.io/ablock/terraform-controller-worker:latest"
+	// Use own controller image
+	image := "quay.io/jsawaya/terraform-controller-worker:latest"
 	workerImageEnvVar, workerImageEnvVarExists := os.LookupEnv("WORKER_IMG")
 	if workerImageEnvVarExists {
 		image = workerImageEnvVar
@@ -304,12 +305,13 @@ func (r *TerraformReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 
 	if existingPod.ObjectMeta.Name != "" {
-		err = r.Delete(ctx, pod)
-		if err != nil {
-			l.Error(err, "Error deleting pod")
-			return ctrl.Result{}, err
-		}
-		l.Info("Deleted")
+		// Allow inspection of pods after completion
+		// err = r.Delete(ctx, pod)
+		// if err != nil {
+		// 	l.Error(err, "Error deleting pod")
+		// 	return ctrl.Result{}, err
+		// }
+		// l.Info("Deleted")
 	} else {
 		err = r.Create(ctx, pod)
 		if err != nil {

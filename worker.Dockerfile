@@ -17,16 +17,12 @@ COPY controllers/ controllers/
 # Build
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o worker cmd/worker/main.go
 
-FROM alpine:latest
+FROM registry.access.redhat.com/ubi8/ubi
 
-RUN apk --no-cache add curl
-
-RUN apk add --update docker openrc
-
-RUN rc-update add docker boot
+RUN yum -y install unzip git
 
 RUN cd /usr/local/bin && \
-    curl https://releases.hashicorp.com/terraform/1.2.3/terraform_1.2.3_linux_amd64.zip -o terraform.zip && \
+    curl https://releases.hashicorp.com/terraform/1.2.0/terraform_1.2.0_linux_amd64.zip -o terraform.zip && \
     unzip terraform.zip && \
     rm terraform.zip
 
@@ -34,4 +30,4 @@ COPY --from=builder /workspace/worker /usr/local/bin/
 
 WORKDIR /opt/manifests
 
-CMD ["/usr/local/bin/worker"]
+CMD ["worker"]
